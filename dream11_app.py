@@ -1,227 +1,183 @@
 import streamlit as st
 import pandas as pd
-import datetime
+import requests
+from datetime import datetime
 
-# Premium Look and Setup
-st.set_page_config(page_title="Dream11 AI Pro Engine", layout="wide")
+# Premium Layout Design Like Cricbuzz Corporate App
+st.set_page_config(page_title="Dream11 Live AI Engine (Original)", layout="wide")
 
 st.markdown("""
     <style>
     .main { background-color: #f4f6f9; }
-    h1 { color: #d71920; font-family: 'Arial Black', sans-serif; text-align: center; margin-bottom: 0px; }
-    .match-card { background-color: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; border-left: 5px solid #d71920; }
-    .green-dot { color: #1d8815; font-weight: bold; }
-    .red-dot { color: #d71920; font-weight: bold; }
-    .stButton>button { background-color: #1d8815; color: white; border-radius: 8px; font-weight: bold; height: 45px; }
-    .stButton>button:hover { background-color: #15660f; color: white; }
+    h1 { color: #d71920; font-family: 'Arial Black', sans-serif; text-align: center; }
+    .match-box { background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 6px solid #d71920; margin-bottom: 20px; }
+    .green-p { color: #1d8815; font-weight: bold; font-size: 14px; }
+    .red-p { color: #d71920; font-weight: bold; font-size: 14px; }
+    .stButton>button { background-color: #d71920; color: white; border-radius: 8px; font-weight: bold; height: 45px; width: 100%; }
+    .stButton>button:hover { background-color: #b51218; color: white; }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🏏 Cricbuzz Style Dream11 AI Prediction Engine")
-st.write("<p style='text-align: center; font-size: 15px; color: #555;'>Real-time Live Scores, Countdown Timer, Automated Lineups with Green/Red Dots</p>", unsafe_allow_html=True)
+st.title("🚀 Dream11 AI Live-to-Live Production Engine")
+st.write("<p style='text-align: center; font-size: 16px; color:#666;'>⚠️ WARNING: 100% Original Data Stream Enabled. No Mock Data Allowed.</p>", unsafe_allow_html=True)
 st.markdown("---")
 
-# ----------------- LIVE CENTRAL ENGINE DATABASE -----------------
-# Auto generating dynamic date times based on current date (June 2026)
-today = datetime.date(2026, 6, 11)
-tomorrow = today + datetime.timedelta(days=1)
+# 🔑 AAPKI RAPIDAPI CRICBUZZ KEY CONFIGURATION
+# (Niche hum ise activate karne ka tarika dekhenge)
+RAPIDAPI_KEY = st.text_input("🔑 Enter Your RapidAPI Cricbuzz Key To Activate Live Server:", type="password")
 
-mock_database = [
-    {
-        "id": "match_1",
-        "type": "LIVE",
-        "name": "West Indies vs Sri Lanka - 1st T20I",
-        "venue": "Kensington Oval, Bridgetown, Barbados",
-        "date_time": f"{today.strftime('%d %B %Y')} - 08:30 PM IST",
-        "status": "West Indies won the toss and elected to bat pehle",
-        "countdown": "🔴 MATCH LIVE IN PROGRESS",
-        "lineup_out": True,
-        "team1": "West Indies", "team2": "Sri Lanka",
-        "squad1": [
-            {"name": "Nicholas Pooran (WK)", "playing": True, "role": "WK", "form": 9.5, "vs_spin": 9.2},
-            {"name": "Shai Hope", "playing": True, "role": "BAT", "form": 8.4, "vs_spin": 8.0},
-            {"name": "Rovman Powell (C)", "playing": True, "role": "BAT", "form": 8.1, "vs_spin": 7.2},
-            {"name": "Andre Russell", "playing": True, "role": "ALL", "form": 9.3, "vs_spin": 8.5},
-            {"name": "Sherfane Rutherford", "playing": True, "role": "BAT", "form": 7.9, "vs_spin": 7.5},
-            {"name": "Romario Shepherd", "playing": True, "role": "ALL", "form": 8.2, "vs_spin": 7.0},
-            {"name": "Gudakesh Motie", "playing": True, "role": "BOWL", "form": 8.8, "vs_spin": 9.5},
-            {"name": "Akeal Hosein", "playing": True, "role": "BOWL", "form": 8.6, "vs_spin": 9.0},
-            {"name": "Alzarri Joseph", "playing": True, "role": "BOWL", "form": 8.3, "vs_spin": 5.0},
-            {"name": "Shamar Joseph", "playing": True, "role": "BOWL", "form": 8.0, "vs_spin": 4.5},
-            {"name": "Roston Chase", "playing": True, "role": "ALL", "form": 8.1, "vs_spin": 8.5},
-            {"name": "Brandon King", "playing": False, "role": "BAT", "form": 7.5, "vs_spin": 7.8} # Bench
-        ],
-        "squad2": [
-            {"name": "Kusal Mendis (WK)", "playing": True, "role": "WK", "form": 8.5, "vs_spin": 8.2},
-            {"name": "Pathum Nissanka", "playing": True, "role": "BAT", "form": 8.9, "vs_spin": 8.5},
-            {"name": "Charith Asalanka (C)", "playing": True, "role": "BAT", "form": 8.6, "vs_spin": 8.8},
-            {"name": "Sadeera Samarawickrama", "playing": True, "role": "BAT", "form": 7.8, "vs_spin": 8.0},
-            {"name": "Wanindu Hasaranga", "playing": True, "role": "ALL", "form": 9.4, "vs_spin": 9.8},
-            {"name": "Kamindu Mendis", "playing": True, "role": "ALL", "form": 8.7, "vs_spin": 9.0},
-            {"name": "Maheesh Theekshana", "playing": True, "role": "BOWL", "form": 8.8, "vs_spin": 9.4},
-            {"name": "Matheesha Pathirana", "playing": True, "role": "BOWL", "form": 9.1, "vs_spin": 5.0},
-            {"name": "Asitha Fernando", "playing": True, "role": "BOWL", "form": 8.0, "vs_spin": 4.0},
-            {"name": "Dilshan Madushanka", "playing": True, "role": "BOWL", "form": 8.2, "vs_spin": 4.5},
-            {"name": "Dunith Wellalage", "playing": True, "role": "ALL", "form": 8.3, "vs_spin": 8.9},
-            {"name": "Bhanuka Rajapaksa", "playing": False, "role": "BAT", "form": 7.2, "vs_spin": 7.0} # Bench
-        ]
-    },
-    {
-        "id": "match_2",
-        "type": "UPCOMING",
-        "name": "Bangladesh vs Australia - 2nd ODI",
-        "venue": "Shere Bangla National Stadium, Mirpur, Dhaka",
-        "date_time": f"{tomorrow.strftime('%d %B %Y')} - 10:30 AM IST",
-        "status": "Toss aur Lineups match shuru hone se 30 min pehle aayenge.",
-        "countdown": "⏳ Starts in 14 Hours 08 Mins",
-        "lineup_out": False,
-        "team1": "Bangladesh", "team2": "Australia",
-        "squad1": [
-            {"name": "Litton Das (WK)", "playing": True, "role": "WK", "form": 7.8, "vs_spin": 7.5},
-            {"name": "Tanzid Hasan", "playing": True, "role": "BAT", "form": 7.5, "vs_spin": 7.2},
-            {"name": "Najmul Hossain Shanto (C)", "playing": True, "role": "BAT", "form": 8.2, "vs_spin": 8.5},
-            {"name": "Shakib Al Hasan", "playing": True, "role": "ALL", "form": 9.4, "vs_spin": 9.2},
-            {"name": "Towhid Hridoy", "playing": True, "role": "BAT", "form": 8.0, "vs_spin": 7.9},
-            {"name": "Mahmudullah", "playing": True, "role": "BAT", "form": 7.9, "vs_spin": 8.0},
-            {"name": "Mehidy Hasan Miraz", "playing": True, "role": "ALL", "form": 8.8, "vs_spin": 9.0},
-            {"name": "Taskin Ahmed", "playing": True, "role": "BOWL", "form": 8.3, "vs_spin": 4.5},
-            {"name": "Mustafizur Rahman", "playing": True, "role": "BOWL", "form": 8.5, "vs_spin": 5.0},
-            {"name": "Shoriful Islam", "playing": True, "role": "BOWL", "form": 8.0, "vs_spin": 4.0},
-            {"name": "Taijul Islam", "playing": True, "role": "BOWL", "form": 8.2, "vs_spin": 8.8}
-        ],
-        "squad2": [
-            {"name": "Travis Head", "playing": True, "role": "BAT", "form": 9.6, "vs_spin": 8.0},
-            {"name": "Jake Fraser-McGurk", "playing": True, "role": "BAT", "form": 8.4, "vs_spin": 7.2},
-            {"name": "Mitchell Marsh (C)", "playing": True, "role": "ALL", "form": 9.0, "vs_spin": 7.8},
-            {"name": "Glenn Maxwell", "playing": True, "role": "ALL", "form": 9.3, "vs_spin": 9.5},
-            {"name": "Marcus Stoinis", "playing": True, "role": "ALL", "form": 8.5, "vs_spin": 7.5},
-            {"name": "Tim David", "playing": True, "role": "BAT", "form": 8.0, "vs_spin": 7.6},
-            {"name": "Alex Carey (WK)", "playing": True, "role": "WK", "form": 8.1, "vs_spin": 8.0},
-            {"name": "Pat Cummins", "playing": True, "role": "BOWL", "form": 9.1, "vs_spin": 5.0},
-            {"name": "Mitchell Starc", "playing": True, "role": "BOWL", "form": 9.4, "vs_spin": 4.0},
-            {"name": "Adam Zampa", "playing": True, "role": "BOWL", "form": 9.5, "vs_spin": 9.8},
-            {"name": "Josh Hazlewood", "playing": True, "role": "BOWL", "form": 8.9, "vs_spin": 4.8}
-        ]
+if not RAPIDAPI_KEY:
+    st.info("💡 **Original App Chalanay Ke Liye:** Niche diye gaye tarike se apni RapidAPI Key nikalein aur upar dalkar server connect karein!")
+else:
+    # Live Real-Time Connection Headers
+    headers = {
+        "X-RapidAPI-Key": RAPIDAPI_KEY,
+        "X-RapidAPI-Host": "cricbuzz-cricket.p.rapidapi.com"
     }
-]
 
-# ----------------- TABS SYSTEM LIKE CRICBUZZ -----------------
-tab_live, tab_upcoming = st.tabs(["🔴 LIVE MATCHES", "📅 UPCOMING MATCHES"])
+    # 1. FETCH LIVE MATCHES LIST DIRECT FROM CRICBUZZ SERVER
+    @st.cache_data(ttl=30) # Har 30 seconds mein background mein automatic live refresh hoga
+    def fetch_real_cricbuzz_matches():
+        try:
+            url = "https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live"
+            response = requests.get(url, headers=headers)
+            return response.json().get("typeMatches", [])
+        except Exception as e:
+            return []
 
-def render_match_dashboard(m_data):
-    st.markdown(f"""
-    <div class='match-card'>
-        <h3>{m_data['name']}</h3>
-        <p><strong>🏟️ Venue:</strong> {m_data['venue']}</p>
-        <p><strong>📅 Date & Time:</strong> {m_data['date_time']}</p>
-        <p style='color: #d71920; font-weight: bold;'>⏰ {m_data['countdown']}</p>
-        <p style='background-color: #e3f2fd; padding: 8px; border-radius: 5px;'>📢 <b>Toss Status:</b> {m_data['status']}</p>
-    </div>
-    """, unsafe_allow_html=True)
+    match_data_raw = fetch_real_cricbuzz_matches()
     
-    # Pitch Control Selector
-    pitch_type = st.selectbox(
-        f"🧠 Select Real-Time Pitch For {m_data['name']}:",
-        ["Flat & Batting Paradise (High Scoring)", "Slow & Spinning (Spinners Friendly)", "Green & Fast Bouncy (Seamers Friendly)", "Balanced Surface"],
-        key=f"pitch_{m_data['id']}"
-    )
+    match_list = []
+    match_map = {}
     
-    st.markdown("---")
-    
-    col_squad, col_analysis = st.columns([1, 1.2])
-    
-    with col_squad:
-        st.subheader("👥 Playing Squads / Lineup Status")
-        if m_data['lineup_out']:
-            st.success("✅ Lineup Officially Out! Dots represent playing status.")
-        else:
-            st.warning("📋 Pre-Toss Mode (Predicted Squad). All shown with 🟢 as temporary.")
-            
-        # Displaying Players with Dots
-        st.markdown(f"#### **🟢 {m_data['team1']} Lineup**")
-        p1_list = []
-        for p in m_data['squad1']:
-            dot = "<span class='green-dot'>🟢 Playing</span>" if p['playing'] else "<span class='red-dot'>🔴 Benched</span>"
-            st.markdown(f"- {p['name']} ({p['role']}) — {dot}", unsafe_allow_html=True)
-            if p['playing'] or not m_data['lineup_out']:
-                p1_list.append(p)
-                
-        st.markdown(f"#### **🟢 {m_data['team2']} Lineup**")
-        p2_list = []
-        for p in m_data['squad2']:
-            dot = "<span class='green-dot'>🟢 Playing</span>" if p['playing'] else "<span class='red-dot'>🔴 Benched</span>"
-            st.markdown(f"- {p['name']} ({p['role']}) — {dot}", unsafe_allow_html=True)
-            if p['playing'] or not m_data['lineup_out']:
-                p2_list.append(p)
+    for match_type in match_data_raw:
+        for m in match_type.get("seriesMatches", []):
+            for detail in m.get("seriesAdWrapper", {}).get("matches", []):
+                m_id = detail.get("matchInfo", {}).get("matchId")
+                m_title = f"{detail.get('matchInfo', {}).get('team1', {}).get('teamName')} vs {detail.get('matchInfo', {}).get('team2', {}).get('teamName')} ({detail.get('matchInfo', {}).get('matchDesc')})"
+                if m_id and m_title:
+                    match_list.append(m_title)
+                    match_map[m_title] = detail
 
-    with col_analysis:
-        st.subheader("📊 Tactical Match Fitment Grid")
+    if not match_list:
+        st.error("❌ Key sahi nahi hai ya API limit khatam ho gayi hai. Kripya correct Cricbuzz Live Feed Key daalein.")
+    else:
+        # Match Selector Box
+        selected_match_title = st.selectbox("🎯 Select Real Internet Live Match:", match_list)
+        selected_match = match_map[selected_match_title]
         
-        all_active_players = []
+        m_info = selected_match.get("matchInfo", {})
+        m_id = m_info.get("matchId")
+        m_status = selected_match.get("matchScore", {}).get("matchScoreDetails", {}).get("customStatus", "Live Coverage Active")
         
-        # Expert Calculation Logic based on parameter selectors
-        def calculate_fitment(p_obj, t_name):
-            score = p_obj['form']
-            fitment_text = "⭐ Highly Consistent"
-            
-            if "Spinning" in pitch_type:
-                if p_obj['role'] == "ALL" or p_obj['vs_spin'] >= 9.0:
-                    score += 1.3
-                    fitment_text = "🔥 Spin Master (Key in Middle Overs)"
-                elif p_obj['role'] == "BOWL" and p_obj['vs_spin'] < 6.0:
-                    score -= 0.7
-                    fitment_text = "⚠️ Medium Assistance for pacers"
-            elif "Green" in pitch_type:
-                if p_obj['role'] == "BOWL" and p_obj['vs_spin'] < 6.0:
-                    score += 1.5
-                    fitment_text = "⚡ Lethal (Early Swing Specialist)"
-                elif p_obj['role'] == "BAT" and p_obj['form'] < 8.5:
-                    score -= 1.0
-                    fitment_text = "❌ Threat (Vulnerable against moving ball)"
-            elif "Flat" in pitch_type:
-                if p_obj['role'] == "BAT" or p_obj['role'] == "WK":
-                    score += 1.1
-                    fitment_text = "🚀 Run Machine (Boundaries King Today)"
-                    
-            return {
-                "Player Name": p_obj['name'],
-                "Team": t_name,
-                "Form": f"⭐ {p_obj['form']}/10",
-                "Tactical Fitting Time": fitment_text,
-                "Expected DT %": f"{min(int(score * 10), 99)}%",
-                "_score": score
-            }
+        # Display Actual Live Card
+        st.markdown(f"""
+        <div class='match-box'>
+            <h2>{selected_match_title}</h2>
+            <p><strong>🏟️ Venue / Ground:</strong> {m_info.get('venueInfo', {}).get('name')}, {m_info.get('venueInfo', {}).get('city')}</p>
+            <p><strong>📢 Live Cricbuzz Status:</strong> {m_status}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # 2. FETCH REAL-TIME SQUADS & LINEUPS
+        @st.cache_data(ttl=20)
+        def fetch_real_squads(match_id):
+            try:
+                url = f"https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/{match_id}/squads"
+                res = requests.get(url, headers=headers)
+                return res.json()
+            except:
+                return {}
 
-        for p in p1_list: all_active_players.append(calculate_fitment(p, m_data['team1']))
-        for p in p2_list: all_active_players.append(calculate_fitment(p, m_data['team2']))
+        squad_data = fetch_real_squads(m_id)
         
-        df = pd.DataFrame(all_active_players)
-        df_sorted = df.sort_values(by="_score", ascending=False)
-        
-        st.dataframe(df_sorted[["Player Name", "Team", "Form", "Tactical Fitting Time", "Expected DT %"]], use_container_width=True, height=280)
+        # Pitch Selector for Strategic Fitment
+        pitch_type = st.selectbox("🧠 Select Pitch/Ground Behavior (For AI Calculations):", ["Flat & High Scoring", "Slow & Turning (Spin Friendly)", "Green & Grass (Pace/Swing Friendly)", "Balanced Surface"])
         
         st.markdown("---")
-        st.subheader("🏆 AI Dream Winning Team Generation")
+        col_squads, col_ai_engine = st.columns([1, 1.2])
         
-        col_t1, col_t2 = st.columns(2)
-        with col_t1:
-            st.markdown("#### 🥇 Safe Team (H2H / Small Leagues)")
-            safe = df_sorted.head(11)
-            st.table(safe[["Player Name", "Expected DT %"]])
-            if len(safe) >= 2:
-                st.caption(f"🔴 **Captain (C):** {safe.iloc[0]['Player Name']} | 🔵 **Vice-Captain (VC):** {safe.iloc[1]['Player Name']}")
-        with col_t2:
-            st.markdown("#### 💣 Grand League Team (Mega Contest)")
-            if len(df_sorted) >= 12:
-                gl = pd.concat([df_sorted.head(6), df_sorted.iloc[8:11], df_sorted.tail(2)])
-            else:
-                gl = df_sorted
-            st.table(gl[["Player Name", "Expected DT %"]])
-            if len(gl) >= 5:
-               
-# Executing layout blocks inside respective tabs
-with tab_live:
-    render_match_dashboard(mock_database[0])
+        team1_players = squad_data.get("team1", {}).get("player", [])
+        team2_players = squad_data.get("team2", {}).get("player", [])
+        
+        active_roster = []
+        
+        with col_squads:
+            st.subheader("👥 Live Lineups (🔴 Red / 🟢 Green Indicators)")
+            
+            # Team 1 Display
+            t1_name = squad_data.get("team1", {}).get("name", "Team 1")
+            st.markdown(f"#### **{t1_name}**")
+            for p in team1_players:
+                is_playing = p.get("played") # Original Boolean from cricbuzz server
+                dot_text = "<span class='green-p'>🟢 Playing XI</span>" if is_playing else "<span class='red-p'>🔴 Substitute / Bench</span>"
+                st.markdown(f"- {p.get('name')} ({p.get('role', 'PLAYER')}) — {dot_text}", unsafe_allow_html=True)
+                if is_playing:
+                    active_roster.append({"name": p.get('name'), "role": p.get('role'), "team": t1_name, "is_captain": p.get('captain', False)})
+                    
+            # Team 2 Display
+            t2_name = squad_data.get("team2", {}).get("name", "Team 2")
+            st.markdown(f"#### **{t2_name}**")
+            for p in team2_players:
+                is_playing = p.get("played")
+                dot_text = "<span class='green-p'>🟢 Playing XI</span>" if is_playing else "<span class='red-p'>🔴 Substitute / Bench</span>"
+                st.markdown(f"- {p.get('name')} ({p.get('role', 'PLAYER')}) — {dot_text}", unsafe_allow_html=True)
+                if is_playing:
+                    active_roster.append({"name": p.get('name'), "role": p.get('role'), "team": t2_name, "is_captain": p.get('captain', False)})
 
-with tab_upcoming:
-    render_match_dashboard(mock_database[1])
+        with col_ai_engine:
+            st.subheader("📊 Pitch-Based Performance Evaluation")
+            
+            if not active_roster:
+                st.info("⏳ Waiting for Toss. Shuruati Squads upar dikh rahi hain, Toss hote hi Playing XI automatic filter ho jayegi!")
+            else:
+                ai_calculated_list = []
+                for p_obj in active_roster:
+                    base_rating = 8.5 if p_obj['is_captain'] or p_obj['role'] == "AllRounder" else 8.0
+                    fitment = "⭐ Form Match"
+                    
+                    # Live Strategic Calculation Engine
+                    if "Spin" in pitch_type:
+                        if p_obj['role'] in ["Bowler", "AllRounder"]:
+                            base_rating += 1.3
+                            fitment = "🔥 Spin Hazard (Highly Effective in middle overs)"
+                    elif "Green" in pitch_type:
+                        if p_obj['role'] == "Bowler":
+                            base_rating += 1.4
+                            fitment = "⚡ Seam/Swing Threat (Lethal in Powerplay)"
+                    elif "Flat" in pitch_type:
+                        if p_obj['role'] == "Batsman":
+                            base_rating += 1.2
+                            fitment = "🚀 Boundary Machine (Flat Surface Aggressor)"
+                            
+                    ai_calculated_list.append({
+                        "Player": p_obj['name'],
+                        "Team": p_obj['team'],
+                        "Role": p_obj['role'],
+                        "Dynamic Rating": f"⭐ {base_rating:.1f}/10",
+                        "Tactical Fit": fitment,
+                        "_score": base_rating
+                    })
+                
+                df_engine = pd.DataFrame(ai_calculated_list)
+                df_sorted = df_engine.sort_values(by="_score", ascending=False)
+                
+                st.dataframe(df_sorted[["Player", "Team", "Role", "Dynamic Rating", "Tactical Fit"]], use_container_width=True, height=300)
+                
+                st.markdown("---")
+                st.subheader("🏆 Live Generated Dream Winning Teams")
+                
+                col_h2h, col_gl = st.columns(2)
+                with col_h2h:
+                    st.markdown("#### 🥇 Safe Team (Head-to-Head / Small League)")
+                    st.table(df_sorted.head(11)[["Player", "Role"]])
+                    st.caption(f"🔴 **C:** {df_sorted.iloc[0]['Player']} | 🔵 **VC:** {df_sorted.iloc[1]['Player']}")
+                    
+                with col_gl:
+                    st.markdown("#### 💣 Mega Grand League Team")
+                    if len(df_sorted) >= 11:
+                        gl_combination = pd.concat([df_sorted.head(7), df_sorted.tail(4)])
+                    else:
+                        gl_combination = df_sorted
+                    st.table(gl_combination[["Player", "Role"]])
+                    st.caption(f"🔴 **C:** {df_sorted.iloc[2]['Player']} | 🔵 **VC:** {df_sorted.iloc[4]['Player']}")
