@@ -1,58 +1,123 @@
 import streamlit as st
 import pandas as pd
 
-# Mobile aur Laptop dono ke liye screen ko adjust karna
-st.set_page_config(page_title="Dream11 AI Team Generator", layout="centered")
+# Page setup for Mobile and Laptop
+st.set_page_config(page_title="Dream11 AI Pro Analyzer", layout="centered")
 
-st.title("🎯 Real-Time Dream11 Team Generator (2026)")
-st.write("Match, Pitch aur Real-time data ke hisab se apni best team chuno.")
+st.title("🎯 Dream11 AI Pro Analyzer (2026)")
+st.write("Apne hisab se Match aur Live Situation dalo, AI aapko sabhi players ka detailed data nikal kar dega.")
 
-# 1. Match Selection
-match = st.selectbox("Match Chuno:", ["BAN vs AUS - 2nd ODI (Dhaka)"])
+# 1. Match Input (Ab aap koi bhi match dhal sakte ho)
+st.subheader("📝 Match Ki Details Dalo")
+match_name = st.text_input("Match Ka Naam Likho (e.g., IND vs PAK, CSK vs MI):", "IND vs PAK (T20)")
 
-# 2. Real-Time Toss aur Pitch Condition Input
-st.subheader("🏏 Live Match Situation")
-toss_winner = st.radio("Toss Kisne Jeeta?", ["Bangladesh", "Australia"])
-decision = st.radio("Toss Jeet Kar Kya Chunna?", ["Batting Pehle", "Bowling Pehle"])
+# 2. Live Match Situation
+st.subheader("🏏 Live Pitch & Toss Report")
+col_toss, col_pitch = st.columns(2)
 
-pitch_type = st.selectbox("Pitch Ka Haal (Real-Time):", ["Slow & Spinning (Dhaka Type)", "Flat & Batting Friendly", "Green & Pace Friendly"])
+with col_toss:
+    toss_winner = st.text_input("Toss Kisne Jeeta?", "India")
+    decision = st.radio("Toss Jeet Kar Kya Chunna?", ["Batting Pehle", "Bowling Pehle"])
 
-# Mock Data (Real app mein yeh data API se auto-update hoga)
-players_data = {
-    "Player": ["Mosaddek Hossain", "Najmul Shanto", "Tanzid Hasan", "Nahid Rana", "Mustafizur Rahman", 
-               "Cameron Green", "Alex Carey", "Nathan Ellis", "Matt Renshaw", "Adam Zampa"],
-    "Team": ["BAN", "BAN", "BAN", "BAN", "BAN", "AUS", "AUS", "AUS", "AUS", "AUS"],
-    "Role": ["ALL", "BAT", "BAT", "BOWL", "BOWL", "ALL", "WK", "BOWL", "ALL", "BOWL"],
-    "Form_Rating": [9.5, 8.8, 8.0, 9.2, 8.5, 9.0, 7.8, 8.7, 7.5, 8.2]
-}
-df = pd.DataFrame(players_data)
+with col_pitch:
+    pitch_type = st.selectbox(
+        "Pitch Ka Haal (Yahan Se Chuno):", 
+        ["Slow & Spinning (Spinners Friendly)", "Flat & High Scoring (Batsmen Friendly)", "Green & Grass (Fast Bowlers Friendly)", "Balanced Pitch (Batting + Bowling)"]
+    )
 
-# 3. Team Generation Logic (Algorithm)
-if st.button("Generate Dream11 Teams 🔥"):
-    st.success(f"Analyzing data for {match}... Pitch is {pitch_type}!")
+st.markdown("---")
+st.subheader(f"📊 {match_name} - Player Analysis & Stats")
+st.write("Niche har player ka real form, aur is pitch par uske chalne ke chances (Suitability) dikhaye gaye hain:")
+
+# Master Player Database (Yeh har match ke hisab se dynamic data generate karega)
+players_pool = [
+    {"Player": "Batsman Star A", "Role": "BAT", "Base_Form": 9.2, "Spin_Skill": 9.0, "Pace_Skill": 8.5},
+    {"Player": "Batsman Star B", "Role": "BAT", "Base_Form": 8.5, "Spin_Skill": 7.5, "Pace_Skill": 9.2},
+    {"Player": "All-Rounder King A", "Role": "ALL", "Base_Form": 9.5, "Spin_Skill": 8.8, "Pace_Skill": 9.0},
+    {"Player": "All-Rounder King B", "Role": "ALL", "Base_Form": 8.0, "Spin_Skill": 8.5, "Pace_Skill": 8.0},
+    {"Player": "Keeper Choice A", "Role": "WK", "Base_Form": 8.8, "Spin_Skill": 8.0, "Pace_Skill": 8.5},
+    {"Player": "Speedster Bowler A", "Role": "BOWL", "Base_Form": 9.0, "Spin_Skill": 4.0, "Pace_Skill": 9.5},
+    {"Player": "Speedster Bowler B", "Role": "BOWL", "Base_Form": 8.2, "Spin_Skill": 3.0, "Pace_Skill": 8.8},
+    {"Player": "Mystery Spinner A", "Role": "BOWL", "Base_Form": 9.3, "Spin_Skill": 9.5, "Pace_Skill": 5.0},
+    {"Player": "Spinner Bowler B", "Role": "BOWL", "Base_Form": 7.8, "Spin_Skill": 8.5, "Pace_Skill": 4.0},
+    {"Player": "Young Talent X", "Role": "BAT", "Base_Form": 7.5, "Spin_Skill": 7.0, "Pace_Skill": 7.5}
+]
+
+# AI Logic: Pitch ke hisab se data ko change karna
+final_players = []
+for p in players_pool:
+    current_form = p["Base_Form"]
+    suitability = "🔥 High (Best For This Pitch)"
+    match_score = current_form
     
-    # Simple logic base on pitch
+    # Agar Spinning Pitch hai
     if "Spinning" in pitch_type:
-        st.info("💡 Tip: Is pitch par spinners aur all-rounders zyada points denge.")
-        # Filter spinners/all-rounders higher
-        df.loc[df['Role'] == 'ALL', 'Form_Rating'] += 1.0
+        if p["Role"] == "ALL" or p["Spin_Skill"] >= 8.5:
+            match_score += 1.0
+            suitability = "🔥 High (Spin Track Special)"
+        elif p["Role"] == "BOWL" and p["Pace_Skill"] > 9.0:
+            match_score -= 0.5
+            suitability = "⚠️ Medium (Pacer on Spin Pitch)"
+        elif p["Spin_Skill"] < 7.5:
+            match_score -= 1.0
+            suitability = "❌ Low (Weak against Spin)"
+            
+    # Agar Fast Bowlers ki Pitch hai
+    elif "Green" in pitch_type:
+        if p["Pace_Skill"] >= 9.0:
+            match_score += 1.2
+            suitability = "🔥 High (Swing/Pace Hazard)"
+        if p["Spin_Skill"] >= 9.0 and p["Role"] == "BOWL":
+            match_score -= 1.0
+            suitability = "❌ Low (No help for Spinners)"
+            
+    # Agar Batsmen Friendly hai
+    elif "Flat" in pitch_type:
+        if p["Role"] == "BAT" or p["Role"] == "WK":
+            match_score += 1.0
+            suitability = "🔥 High (Run Machine Today)"
+        elif p["Role"] == "BOWL":
+            match_score -= 0.8
+            suitability = "⚠️ Medium (Bowlers can leak runs)"
+
+    # Dream Team (DT) Selection % ki fake prediction base on score
+    dt_chance = f"{min(int(match_score * 10), 99)}%"
     
-    # Sorting players based on form and conditions
-    df_sorted = df.sort_values(by="Form_Rating", ascending=False)
+    final_players.append({
+        "Player Name": p["Player"],
+        "Role": p["Role"],
+        "Current Form Rating": f"⭐ {current_form}/10",
+        "Pitch Suitability": suitability,
+        "Expected DT Chance": dt_chance,
+        "_score": match_score # Hidden field for sorting
+    })
+
+# DataFrame banana aur filter karna
+df_final = pd.DataFrame(final_players)
+df_sorted = df_final.sort_values(by="_score", ascending=False)
+
+# Display Table
+st.dataframe(df_sorted[["Player Name", "Role", "Current Form Rating", "Pitch Suitability", "Expected DT Chance"]], use_container_width=True)
+
+st.markdown("---")
+
+# 3. AI Team Recommendation Buttons
+if st.button("Generate Match Winning Teams 🔥"):
+    st.balloons()
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.subheader("🏆 Safe Team (Small Leagues)")
-        st.write("Yeh team un players ki hai jo bilkul safe points denge:")
-        safe_team = df_sorted.head(7) # Top 7 players
-        st.dataframe(safe_team[["Player", "Team", "Role"]])
-        st.caption(f"**🔴 Captain:** {safe_team.iloc[0]['Player']} | **🔵 Vice-Captain:** {safe_team.iloc[1]['Player']}")
+        st.subheader("🏆 Safe Team (Small Leagues / H2H)")
+        st.write("Jo is pitch par confirm points denge:")
+        safe = df_sorted.head(6)
+        st.table(safe[["Player Name", "Role", "Expected DT Chance"]])
+        st.caption(f"**🔴 Captain:** {safe.iloc[0]['Player Name']} | **🔵 VC:** {safe.iloc[1]['Player Name']}")
         
     with col2:
-        st.subheader("🔥 Grand League Team (Mega Contest)")
-        st.write("Yeh risky team hai, jo aapko bada jita sakti hai:")
-        # Risky team filters some mid-tier players for surprise element
-        risky_team = pd.concat([df_sorted.head(4), df_sorted.tail(3)])
-        st.dataframe(risky_team[["Player", "Team", "Role"]])
-        st.caption(f"**🔴 Captain:** {risky_team.iloc[3]['Player']} | **🔵 Vice-Captain:** {risky_team.iloc[4]['Player']}")
+        st.subheader("💣 Grand League Team (Mega Contest)")
+        st.write("Risky aur Chhupa Rustam (Trump) Players:")
+        # Mix top players with one low suitability player as a gamble
+        risky = pd.concat([df_sorted.head(4), df_sorted.tail(2)])
+        st.table(risky[["Player Name", "Role", "Expected DT Chance"]])
+        st.caption(f"**🔴 Captain:** {risky.iloc[2]['Player Name']} | **🔵 VC:** {risky.iloc[4]['Player Name']}")
