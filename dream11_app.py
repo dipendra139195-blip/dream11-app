@@ -218,8 +218,7 @@ def render_match_dashboard(m_data):
                 gl = df_sorted
             st.table(gl[["Player Name", "Expected DT %"]])
             if len(gl) >= 5:
-                st.caption(f"🔴 **Captain (C):** {gl.iloc[2]['Player Name']} | 🔵 **Vice-Captain (VC):** {gl_lineup = gl.iloc[4]['Player Name']}")
-
+               
 # Executing layout blocks inside respective tabs
 with tab_live:
     render_match_dashboard(mock_database[0])
